@@ -1,0 +1,21 @@
+<h2 align="center">Course List</h2>
+<div align="center">
+	<table border="1">
+		<tr>
+			<th>Game</th>
+			<th>Time</th>
+			<th>Date</th>
+			<th>Description</th>
+			<th>Prize</th>
+		</tr>
+	{{#each tourneyInfo}}
+		<tr>
+			<td>{{game}}</td>
+			<td>{{time}}</td>
+			<td>{{date}}</td>
+			<td>{{description}}</td>
+			<td>{{prize}}</td>
+		</tr>
+	{{/each}}
+	</table>
+</div>

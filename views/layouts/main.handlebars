@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Xenoverse Gaming</title>
+	<script src="//code.jquery.com/jquery-2.0.2.min.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+	body {
+		background-color: #FF9F00;
+		font-family: Times;
+	}
+	.top {
+		padding: 40px;
+		text-align: center;
+		background: #FF6900;
+	}
+	.rotate90 {
+		-webkit-transform: rotate(90deg);
+		-moz-transform: rotate(90deg);
+		-o-transform: rotate(90deg);
+		-ms-transform: rotate(90deg);
+		transform: rotate(90deg);
+	}
+	.topnav {
+		overflow: hidden;
+		background-color: black;
+	}
+	.topnav a {
+		float: left;
+		color: white;
+		text-align: cetner;
+		padding: 14px 16px;
+		text-decoration: none;
+		text-size: 17px;
+	}
+	.topnav a:hover {
+		background-color: black;
+		color: white'
+	}
+	.topnav a.active {
+		background-color: white;
+		color: black;
+	}
+	</style>
+</head>
+<body>
+	<div align="center" class="top">
+		<h1>Xenoverse Gaming</h1>
+	</div>
+	<div align="right" class="user">
+		{{#if name}}
+		<h2>Welcome, {{name}}!</h2>
+		<a href="/logout">Logout</a>
+		{{else}}
+		<h2>Welcome, Guest!</h2>
+		<a href="/login">Login</a>
+		{{/if}}
+		{{#if email}}
+		<h2>Welcome, {{email}}!</h2>
+		<a href="/logout">Logout</a>
+		{{else}}
+		<h2>Welcome, Guest!</h2>
+		<a href="/login">Login</a>
+		{{/if}}
+	</div>
+	<div align="center" class="topnav">
+		<a href="/"><button>Home</button></a>
+		<a href="/activities"><button>Activities</button></a>
+		<a href="/contact"><button>Contact Us!</button></a>
+		<a href="/feedback"><button>Give Us Feedback!</button></a>
+	</div>
+	{{{body}}}
+</body>
+</html>
