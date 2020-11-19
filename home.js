@@ -15,7 +15,7 @@ if( app.thing == null ) console.log( 'bleat!' );
 
 app.use(require('body-parser')());
 app.use(require('cookie-parser')(credentials.cookieSecret));
-app.use(require('express-session')());
+app.use(require('express-session')({ secret: 'RandomJumbleofLetters' }));
 app.use(function(req, res, next) {
 	res.locals.name = req.session.name;
 	next();
@@ -23,7 +23,7 @@ app.use(function(req, res, next) {
 app.post('/process', function(req, res){
 	var name = req.body.name;
 	var comment = req.body.comment;
-	var email = req.body.name2;
+//	var email = req.body.name2;
 	if (name) {
 		req.session.name = name;
 		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
@@ -31,7 +31,7 @@ app.post('/process', function(req, res){
 		console.log('Name token (from hidden form field): ' + req.body.name);
 		console.log('Email (from visible form field): ' + req.body.email);
 		console.log('Password (from visible form field): ' + req.body.pass);
-		res.redirect(303, '/registered')
+		res.redirect(303, '/redirect')
 	};
 	if (comment) {
 		req.session.comment = comment;
@@ -42,43 +42,43 @@ app.post('/process', function(req, res){
 		console.log('Comment (from hidden form field): ' + req.body.comment);
 		res.redirect(303, '/thankfeed')
 	};
-	if (email) {
-		req.session.name2 = email;
-		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
-		console.log('Form (from querystring): ' + req.query.form);
-		console.log('Name token (from hidden form field): ' + req.body.name2);
-		console.log('Email (from visible form field): ' + req.body.email);
-		console.log('Password (from visible form field): ' + req.body.pass);
-		res.redirect(303, '/redirect')
-	};
+//	if (email) {
+//		req.session.name2 = email;
+//		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+//		console.log('Form (from querystring): ' + req.query.form);
+//		console.log('Name token (from hidden form field): ' + req.body.name2);
+//		console.log('Email (from visible form field): ' + req.body.email);
+//		console.log('Password (from visible form field): ' + req.body.pass);
+//		res.redirect(303, '/redirect')
+//	};
 });
 
 var tourneyInfo = [
 	{
 		"game": "Super Smash Bros. Ultimate",
 		"time": "3pm",
-		"date": "March 25, 2021"
-		"description": "Debut tournament at Xenoverse Gaming for the fabled platformer-fighter developed by Masahrio Sakurai.",
+		"date": "March 25, 2021",
+		"description": "Debut tournament at Xenoverse Gaming for the fabled platformer-fighter developed by Masahiro Sakurai.",
 		"prize": "$500 for first place, $250 for runner-up, $125 each for the two in third place."
 	},
 	{
 		"game": "Mario Kart 8 Deluxe",
 		"time": "3pm",
-		"date": "March 26, 2021"
+		"date": "March 26, 2021",
 		"description": "Debut tournament at Xenoverse Gaming for Mario Kart 8 Deluxe.",
 		"prize": "$500 for first place, $250 for runner-up, $125 each for the two in third place."
 	},
 	{
 		"game": "Splatoon 2",
 		"time": "3pm",
-		"date": "March 27-28, 2021"
+		"date": "March 27-28, 2021",
 		"description": "Debut tournament at Xenoverse Gaming for Splatoon 2. Planned to last across two days",
 		"prize": "$1000 for first place team, $500 for runner-up team."
 	},
 	{
 		"game": "Dragonball FighterZ",
 		"time": "3pm",
-		"date": "March 24, 2021"
+		"date": "March 24, 2021",
 		"description": "Debut tournament at Xenoverse Gaming for Dragonball FighterZ.",
 		"prize": "$500 for first place, $250 for runner-up, $125 each for the two in third place."
 	}
@@ -88,8 +88,8 @@ app.get('/', function(req, res) {
 	res.cookie('xenoverse');
 	var xenoblade = req.cookies.xenoverse;
 });
-app.get('/activites', function(req, res) {
-	res.render('activites');
+app.get('/activities', function(req, res) {
+	res.render('activities');
 });
 app.get('/tournaments', function(req, res) {
 	res.render('tournaments', { tourneyInfo: tourneyInfo });
@@ -109,18 +109,18 @@ app.get('/thankfeed', function(req, res) {
 app.get('/login', function(req, res) {
 	res.render('login', { csrf: 'CSRF random value' });
 });
-app.get('/register', function(req, res) {
-	res.render('register', { csrf: 'CSRF random value' });
-});
+//app.get('/register', function(req, res) {
+//	res.render('register', { csrf: 'CSRF random value' });
+//});
 app.get('/logout', function(req, res) {
 	res.render('logout');
 });
 app.get('/redirect', function(req, res) {
 	res.render('redirect');
 });
-app.get('/registered', function(req, res) {
-	res.render('registered');
-});
+//app.get('/registered', function(req, res) {
+//	res.render('registered');
+//});
 app.use(function(req, res) {
 	res.status(404);
 	res.render('404');
