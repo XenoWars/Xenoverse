@@ -51,9 +51,11 @@
 	<div align="right" class="user">
 		{{#if name}}
 		<h2>Welcome, {{name}}!</h2>
+		<p>Users online: {{count}}</p>
 		<a href="/logout">Logout</a>
 		{{else}}
 		<h2>Welcome, Guest!</h2>
+		<p>Users online: {{count}}</p>
 		<a href="/login">Login</a>
 		{{/if}}
 	</div>
