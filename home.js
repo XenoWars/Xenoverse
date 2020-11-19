@@ -2,6 +2,8 @@ var express = require('express');
 var app = express();
 var credentials = require('./credentials.js');
 var handlebars = require('express3-handlebars').create({ defaultLayout: 'main' });
+var count = 0;
+
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 
@@ -18,6 +20,7 @@ app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({ secret: 'RandomJumbleofLetters' }));
 app.use(function(req, res, next) {
 	res.locals.name = req.session.name;
+	res.locals.count = count;
 	next();
 });
 app.post('/process', function(req, res){
@@ -31,7 +34,8 @@ app.post('/process', function(req, res){
 		console.log('Name token (from hidden form field): ' + req.body.name);
 		console.log('Email (from visible form field): ' + req.body.email);
 		console.log('Password (from visible form field): ' + req.body.pass);
-		res.redirect(303, '/redirect')
+		res.redirect(303, '/redirect');
+		count++;
 	};
 	if (comment) {
 		req.session.comment = comment;
@@ -113,7 +117,9 @@ app.get('/login', function(req, res) {
 //	res.render('register', { csrf: 'CSRF random value' });
 //});
 app.get('/logout', function(req, res) {
-	res.render('logout');
+	delete req.session.name;
+	res.redirect(303, '/');
+	count--;
 });
 app.get('/redirect', function(req, res) {
 	res.render('redirect');
