@@ -56,14 +56,16 @@
 		{{else}}
 		<h2>Welcome, Guest!</h2>
 		<p>Users online: {{count}}</p>
-		<a href="/login">Login</a>
+		<p><a href="/login">Login</a> --- <a href="/register">Register</a></p>
 		{{/if}}
 	</div>
 	<div align="center" class="topnav">
 		<a href="/"><button>Home</button></a>
 		<a href="/activities"><button>Activities</button></a>
 		<a href="/contact"><button>Contact Us!</button></a>
+		{{#if name}}
 		<a href="/feedback"><button>Give Us Feedback!</button></a>
+		{{/if}}
 	</div>
 	{{{body}}}
 </body>

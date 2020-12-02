@@ -1,6 +1,9 @@
-var express = require('express');
+var http = require("http");
+var fs = require("fs");
+var mysql = require("mysql");
+var credentials = require("./credentials");
+var qs = require("querystring");var express = require('express');
 var app = express();
-var credentials = require('./credentials.js');
 var handlebars = require('express3-handlebars').create({ defaultLayout: 'main' });
 var count = 0;
 
@@ -23,38 +26,135 @@ app.use(function(req, res, next) {
 	res.locals.count = count;
 	next();
 });
-app.post('/process', function(req, res){
+
+app.post('/reg', function(req, res) {
+  var name = req.body.name;
+  var email = req.body.email;
+	var pass = req.body.pass;
+	var admin = false;
+  var users = {
+      name: req.body.name,
+      email: req.body.email,
+			pass: req.body.pass
+  }
+    var conn = mysql.createConnection(credentials.connection);
+		conn.connect(function(err) {
+	    if (err) {
+	      console.error("ERROR: cannot connect: " + e);
+	      return;
+	    }
+    conn.query('INSERT INTO USERS SET ?', users, function(err, results, rows, fields) {
+      if (err) {
+        res.locals.message = "It appears there is an issue.";
+        res.redirect(303, '/register?error='+err);
+      }
+			else if (name && email && pass) {
+      		conn.query('SELECT * FROM USERS WHERE NAME = ? AND EMAIL = ? AND PASS = ?', [name, email, pass], function(err, results, rows, fields) {
+      			if (results.length > 0) {
+      				req.session.loggedin = true;
+      				req.session.name = name;
+              req.session.user_ID = results[0].ID;
+              console.log(req.session.user_ID);
+      				res.redirect(303, '/registered');
+              count++;
+      			}
+						else {
+              res.locals.message = "It appears there is an issue.";
+      				res.redirect(303, '/login?error='+err);
+      			}
+      			res.end();
+      		});
+					console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+					console.log('Form (from querystring): ' + req.query.form);
+					console.log('Name token (from hidden form field): ' + req.body.name);
+					console.log('Email (from visible form field): ' + req.body.email);
+					console.log('Password (from visible form field): ' + req.body.pass);
+      	}
+				else {
+          res.locals.message = "It appears there is an issue.";
+          res.redirect(303, '/login?error='+err);
+      		res.end();
+      	}
+    });
+	});
+});
+app.post('/log', function(req, res){
 	var name = req.body.name;
-	var comment = req.body.comment;
-//	var email = req.body.name2;
-	if (name) {
-		req.session.name = name;
+	var email = req.body.email;
+	var pass = req.body.pass;
+	if (name && email && pass) {
+		var conn = mysql.createConnection(credentials.connection);
+		conn.connect(function(err) {
+	    if (err) {
+	      console.error("ERROR: cannot connect: " + e);
+	      return;
+	    }
+		conn.query('SELECT * FROM USERS WHERE NAME = ? AND EMAIL = ? AND PASS = ?', [name, email, pass], function(err, results, rows, fields) {
+	    if (results.length > 0 && results[0].isADMIN === 1) {
+	      req.session.loggedin = true;
+	      req.session.name = name;
+	      req.session.user_ID = results[0].ID;
+	      console.log(req.session.user_ID);
+	      count++;
+	      res.redirect(303,'/admin');
+	    }
+			else if (results.length > 0) {
+	      req.session.loggedin = true;
+	      req.session.name = name;
+	      req.session.user_ID = results[0].ID;
+	      console.log(req.session.user_ID);
+	      count++;
+	      res.redirect(303,'/redirect');
+	    }
+			else {
+	      res.locals.message = "It appears there is an issue.";
+	      res.redirect(303, '/login?error='+err);
+	    }
+			res.end();
+		});
 		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
 		console.log('Form (from querystring): ' + req.query.form);
-		console.log('Name token (from hidden form field): ' + req.body.name);
+		console.log('Name (from visible form field): ' + req.body.name);
 		console.log('Email (from visible form field): ' + req.body.email);
 		console.log('Password (from visible form field): ' + req.body.pass);
-		res.redirect(303, '/redirect');
-		count++;
-	};
-	if (comment) {
-		req.session.comment = comment;
-		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
-		console.log('Form (from querystring): ' + req.query.form);
-		console.log('Name token (from visible form field): ' + req.body.name3);
-		console.log('Email (from visible form field): ' + req.body.email);
-		console.log('Comment (from hidden form field): ' + req.body.comment);
-		res.redirect(303, '/thankfeed')
-	};
-//	if (email) {
-//		req.session.name2 = email;
-//		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
-//		console.log('Form (from querystring): ' + req.query.form);
-//		console.log('Name token (from hidden form field): ' + req.body.name2);
-//		console.log('Email (from visible form field): ' + req.body.email);
-//		console.log('Password (from visible form field): ' + req.body.pass);
-//		res.redirect(303, '/redirect')
-//	};
+	});
+  }
+	else {
+    res.locals.message = "It appears there is an issue.";
+    res.redirect(303, '/login?error='+err);
+		res.end();
+	}
+});
+app.post('/fdbk', function(req, res) {
+  var name = req.body.name;
+  var email = req.body.email;
+  var comment = req.body.comment;
+  var submit = {
+			name: req.body.name,
+			email: req.body.email,
+      comment: req.body.comment
+    }
+		var conn = mysql.createConnection(credentials.connection);
+		conn.connect(function(err) {
+	    if (err) {
+	      console.error("ERROR: cannot connect: " + e);
+	      return;
+	    }
+    	conn.query('INSERT INTO FEEDBACK SET ?', submit, function(err, results, rows, fields) {
+      	if (err) {
+        	res.locals.message = "It appears there is an issue.";
+        	res.redirect(303, '/feedback?error='+err);
+      	}
+				else {
+					console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+					console.log('Form (from querystring): ' + req.query.form);
+					console.log('Name token (from hidden form field): ' + req.body.name);
+					console.log('Email (from visible form field): ' + req.body.email);
+					console.log('Password (from visible form field): ' + req.body.comment);
+					res.redirect(303, '/thankfeed');
+    		}
+		})
+	})
 });
 
 var tourneyInfo = [
@@ -92,6 +192,23 @@ app.get('/', function(req, res) {
 	res.cookie('xenoverse');
 	var xenoblade = req.cookies.xenoverse;
 });
+app.get('/admin', function(req, res) {
+	res.render('admin');
+});
+app.get('/users', function(req, res) {
+	var conn = mysql.createConnection(credentials.connection);
+  conn.query('SELECT * FROM USERS', function(err, rows, results, fields){
+    console.log(rows);
+		res.render('users', { rows: rows });
+	});
+});
+app.get('/userfdbk', function(req, res) {
+	var conn = mysql.createConnection(credentials.connection);
+  conn.query('SELECT * FROM FEEDBACK', function(err, rows, results, fields){
+    console.log(rows);
+		res.render('userfdbk', { rows: rows });
+	});
+});
 app.get('/activities', function(req, res) {
 	res.render('activities');
 });
@@ -113,9 +230,9 @@ app.get('/thankfeed', function(req, res) {
 app.get('/login', function(req, res) {
 	res.render('login', { csrf: 'CSRF random value' });
 });
-//app.get('/register', function(req, res) {
-//	res.render('register', { csrf: 'CSRF random value' });
-//});
+app.get('/register', function(req, res) {
+	res.render('register', { csrf: 'CSRF random value' });
+});
 app.get('/logout', function(req, res) {
 	delete req.session.name;
 	res.redirect(303, '/');
@@ -124,9 +241,9 @@ app.get('/logout', function(req, res) {
 app.get('/redirect', function(req, res) {
 	res.render('redirect');
 });
-//app.get('/registered', function(req, res) {
-//	res.render('registered');
-//});
+app.get('/registered', function(req, res) {
+	res.render('registered');
+});
 app.use(function(req, res) {
 	res.status(404);
 	res.render('404');
