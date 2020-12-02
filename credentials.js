@@ -1,3 +1,0 @@
-credentials = {
-	cookieSecret: 'MixedJumbleofLetters'
-};
