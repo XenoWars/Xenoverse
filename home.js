@@ -23,6 +23,7 @@ app.use(require('cookie-parser')(credentials.cookieSecret));
 app.use(require('express-session')({ secret: 'RandomJumbleofLetters' }));
 app.use(function(req, res, next) {
 	res.locals.name = req.session.name;
+	res.locals.admin = req.session.admin;
 	res.locals.count = count;
 	next();
 });
@@ -31,7 +32,6 @@ app.post('/reg', function(req, res) {
   var name = req.body.name;
   var email = req.body.email;
 	var pass = req.body.pass;
-	var admin = false;
   var users = {
       name: req.body.name,
       email: req.body.email,
@@ -82,6 +82,7 @@ app.post('/log', function(req, res){
 	var name = req.body.name;
 	var email = req.body.email;
 	var pass = req.body.pass;
+	var admin = req.body.name;
 	if (name && email && pass) {
 		var conn = mysql.createConnection(credentials.connection);
 		conn.connect(function(err) {
@@ -92,7 +93,7 @@ app.post('/log', function(req, res){
 		conn.query('SELECT * FROM USERS WHERE NAME = ? AND EMAIL = ? AND PASS = ?', [name, email, pass], function(err, results, rows, fields) {
 	    if (results.length > 0 && results[0].isADMIN === 1) {
 	      req.session.loggedin = true;
-	      req.session.name = name;
+	      req.session.admin = admin;
 	      req.session.user_ID = results[0].ID;
 	      console.log(req.session.user_ID);
 	      count++;
@@ -275,13 +276,14 @@ app.get('/thankfeed', function(req, res) {
 	res.render('thankfeed');
 });
 app.get('/login', function(req, res) {
-	res.render('login', { csrf: 'CSRF random value' });
+	res.render('login', { csrf: 'CSRF random value'});
 });
 app.get('/register', function(req, res) {
 	res.render('register', { csrf: 'CSRF random value' });
 });
 app.get('/logout', function(req, res) {
 	delete req.session.name;
+	delete req.session.admin;
 	res.redirect(303, '/');
 	count--;
 });

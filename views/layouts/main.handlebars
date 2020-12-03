@@ -49,6 +49,11 @@
 		<h1>Xenoverse Gaming</h1>
 	</div>
 	<div align="right" class="user">
+		{{#if admin}}
+		<h2>Welcome, {{admin}}!</h2>
+		<p>Users online: {{count}}</p>
+		<a href="/admin">Administration</a> --- <a href="/logout">Logout</a>
+		{{else}}
 		{{#if name}}
 		<h2>Welcome, {{name}}!</h2>
 		<p>Users online: {{count}}</p>
@@ -57,6 +62,7 @@
 		<h2>Welcome, Guest!</h2>
 		<p>Users online: {{count}}</p>
 		<p><a href="/login">Login</a> --- <a href="/register">Register</a></p>
+		{{/if}}
 		{{/if}}
 	</div>
 	<div align="center" class="topnav">
