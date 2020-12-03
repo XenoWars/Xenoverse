@@ -148,10 +148,44 @@ app.post('/fdbk', function(req, res) {
 				else {
 					console.log('CSRF token (from hidden form field): ' + req.body._csrf);
 					console.log('Form (from querystring): ' + req.query.form);
-					console.log('Name token (from hidden form field): ' + req.body.name);
+					console.log('Name token (from visible form field): ' + req.body.name);
 					console.log('Email (from visible form field): ' + req.body.email);
 					console.log('Password (from visible form field): ' + req.body.comment);
 					res.redirect(303, '/thankfeed');
+    		}
+		})
+	})
+});
+app.post('/tnmt', function(req, res) {
+  var name = req.body.name;
+  var email = req.body.email;
+  var tag = req.body.tag;
+	var game = req.body.game;
+  var submit = {
+			name: req.body.name,
+			email: req.body.email,
+      tag: req.body.tag,
+			game: req.body.game
+    }
+		var conn = mysql.createConnection(credentials.connection);
+		conn.connect(function(err) {
+	    if (err) {
+	      console.error("ERROR: cannot connect: " + e);
+	      return;
+	    }
+    	conn.query('INSERT INTO TOURNEY SET ?', submit, function(err, results, rows, fields) {
+      	if (err) {
+        	res.locals.message = "It appears there is an issue.";
+        	res.redirect(303, '/tourneyreg?error='+err);
+      	}
+				else {
+					console.log('CSRF token (from hidden form field): ' + req.body._csrf);
+					console.log('Form (from querystring): ' + req.query.form);
+					console.log('Name token (from visible form field): ' + req.body.name);
+					console.log('Email (from visible form field): ' + req.body.email);
+					console.log('Gamer Tag (from visible form field): ' + req.body.tag);
+					console.log('Game (from visible form field): ' + req.body.game);
+					res.redirect(303, '/tnmtredirect');
     		}
 		})
 	})
@@ -209,11 +243,24 @@ app.get('/userfdbk', function(req, res) {
 		res.render('userfdbk', { rows: rows });
 	});
 });
+app.get('/usertnmt', function(req, res) {
+	var conn = mysql.createConnection(credentials.connection);
+  conn.query('SELECT * FROM TOURNEY', function(err, rows, results, fields){
+    console.log(rows);
+		res.render('usertnmt', { rows: rows });
+	});
+});
 app.get('/activities', function(req, res) {
 	res.render('activities');
 });
 app.get('/tournaments', function(req, res) {
 	res.render('tournaments', { tourneyInfo: tourneyInfo });
+});
+app.get('/tourneyreg', function(req, res) {
+	res.render('tourneyreg', { csrf: 'SCRF random value' });
+});
+app.get('/tnmtredirect', function(req, res) {
+	res.render('tnmtredirect');
 });
 app.get('/feedback', function(req, res) {
 	res.render('feedback', { csrf: 'CSRF random value' });
