@@ -28,7 +28,7 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.post('/reg', function(req, res) {
+app.post('/reg', function(req, res, err) {
   var name = req.body.name;
   var email = req.body.email;
 	var pass = req.body.pass;
@@ -60,7 +60,8 @@ app.post('/reg', function(req, res) {
       			}
 						else {
               res.locals.message = "It appears there is an issue.";
-      				res.redirect(303, '/login?error='+err);
+							window.alert("No users match this criteria!");
+							res.redirect(303, '/register?error='+err);
       			}
       			res.end();
       		});
@@ -72,28 +73,27 @@ app.post('/reg', function(req, res) {
       	}
 				else {
           res.locals.message = "It appears there is an issue.";
-          res.redirect(303, '/login?error='+err);
+					console.log("User did not enter all criteria.")
+					res.redirect(303, '/register?error='+err);
       		res.end();
       	}
     });
 	});
 });
-app.post('/log', function(req, res){
-	var name = req.body.name;
+app.post('/log', function(req, res, err){
 	var email = req.body.email;
 	var pass = req.body.pass;
-	var admin = req.body.name;
-	if (name && email && pass) {
+	if (email && pass) {
 		var conn = mysql.createConnection(credentials.connection);
 		conn.connect(function(err) {
 	    if (err) {
 	      console.error("ERROR: cannot connect: " + e);
 	      return;
 	    }
-		conn.query('SELECT * FROM USERS WHERE NAME = ? AND EMAIL = ? AND PASS = ?', [name, email, pass], function(err, results, rows, fields) {
+		conn.query('SELECT * FROM USERS WHERE EMAIL = ? AND PASS = ?', [email, pass], function(err, results, rows, fields) {
 	    if (results.length > 0 && results[0].isADMIN === 1) {
 	      req.session.loggedin = true;
-	      req.session.admin = admin;
+	      req.session.admin = results[0].NAME;
 	      req.session.user_ID = results[0].ID;
 	      console.log(req.session.user_ID);
 	      count++;
@@ -101,7 +101,7 @@ app.post('/log', function(req, res){
 	    }
 			else if (results.length > 0) {
 	      req.session.loggedin = true;
-	      req.session.name = name;
+	      req.session.name = results[0].NAME;
 	      req.session.user_ID = results[0].ID;
 	      console.log(req.session.user_ID);
 	      count++;
@@ -109,20 +109,22 @@ app.post('/log', function(req, res){
 	    }
 			else {
 	      res.locals.message = "It appears there is an issue.";
-	      res.redirect(303, '/login?error='+err);
+				console.log("Criteria did yield any matches.")
+				res.redirect(303, '/login?error='+err);
 	    }
 			res.end();
 		});
 		console.log('CSRF token (from hidden form field): ' + req.body._csrf);
 		console.log('Form (from querystring): ' + req.query.form);
-		console.log('Name (from visible form field): ' + req.body.name);
+		console.log('Name (from hidden form field): ' + req.body.name);
 		console.log('Email (from visible form field): ' + req.body.email);
 		console.log('Password (from visible form field): ' + req.body.pass);
 	});
   }
 	else {
     res.locals.message = "It appears there is an issue.";
-    res.redirect(303, '/login?error='+err);
+		console.log("User did not enter all criteria.")
+		res.redirect(303, '/login?error=' + err);
 		res.end();
 	}
 });
@@ -297,7 +299,7 @@ app.use(function(req, res) {
 	res.status(404);
 	res.render('404');
 });
-app.use(function(req, res) {
+app.use(function(req, res, err) {
 	console.error(err.stack);
 	res.status(500);
 	res.render('500');
