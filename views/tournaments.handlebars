@@ -22,6 +22,14 @@
 	{{/each}}
 	</table>
 </div>
+{{#if admin}}
 <form align="center" action="/tourneyreg">
 	<button type="submit">Register for Tournament</button>
 </form>
+{{else}}
+{{#if name}}
+<form align="center" action="/tourneyreg">
+	<button type="submit">Register for Tournament</button>
+</form>
+{{/if}}
+{{/if}}

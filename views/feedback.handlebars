@@ -1,16 +1,16 @@
 <h2 align="center">Have any concerns or comments? Give us some feedback!</h2>
-<form class="form-horizontal" role="form" action="/fdbk?form=feedback" method="POST">
+<form align="center" class="form-horizontal" role="form" action="/fdbk?form=feedback" method="POST">
 	<input type="hidden" name="_csrf" value="{{csrf}}">
 	<div class="form-group">
 		<label for="fieldName" class="col-sm-2 control-label">Name:</label>
 		<div class="col-sm-4">
-			<input type="text" class="form-control" id="fieldName" name="name">
+			<input type="text" class="form-control" required id="fieldName" name="name">
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="fieldEmail" class="col-sm-2 control-label">Email:</label>
 		<div class="col-sm-4">
-			<input type="email" class="form-control" required id="fieldEmail" name="email">
+			<input type="text" class="form-control" required id="fieldEmail" name="email">
 		</div>
 	</div>
 	<div class="form-group">

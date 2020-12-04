@@ -153,7 +153,7 @@ app.post('/fdbk', function(req, res) {
 					console.log('Form (from querystring): ' + req.query.form);
 					console.log('Name token (from visible form field): ' + req.body.name);
 					console.log('Email (from visible form field): ' + req.body.email);
-					console.log('Password (from visible form field): ' + req.body.comment);
+					console.log('Comment (from visible form field): ' + req.body.comment);
 					res.redirect(303, '/thankfeed');
     		}
 		})
@@ -260,7 +260,7 @@ app.get('/tournaments', function(req, res) {
 	res.render('tournaments', { tourneyInfo: tourneyInfo });
 });
 app.get('/tourneyreg', function(req, res) {
-	res.render('tourneyreg', { csrf: 'SCRF random value' });
+	res.render('tourneyreg', { csrf: 'CSRF random value' });
 });
 app.get('/tnmtredirect', function(req, res) {
 	res.render('tnmtredirect');
